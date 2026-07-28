@@ -1,13 +1,16 @@
 Public accessible link can be found at:
 
-  pitcher-scouting-report.streamlit.app
+pitcher-scouting-report.streamlit.app
 
 
 Enter a pitchers name to pull up their report. This report follows the typical layout and statistics shown by 
-most organizations in their daily advance hitters meetings each game as close as possible. 
+most organizations in their daily advance hitters meetings each game as close as possible.
+
+Statistical and plotting search is only for the 2026 MLB season currently, MiLB stats are not included.
+If a Pitcher has big league time in 2026 season but is not currently on a big league roster, the report will still be generated but will only display MLB stats
 
 Each report is broken down into 3 different tabs
-  - overall matchup statistics and plots over the entire season
+  - overall statistics and plots over the entire season
   - season statistics and plots vs RHHs
   - season statistics and plots vs LHHs
 
