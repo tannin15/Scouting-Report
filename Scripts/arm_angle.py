@@ -2,15 +2,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.patches import Polygon
 from PIL import Image
+from pathlib import Path
 
 
-RHP_LOW = Image.open("Images/rhp_low.png")
-RHP_MID = Image.open("Images/rhp_mid.png")
-RHP_HIGH = Image.open("Images/rhp_high.png")
+RHP_LOW = Image.open(IMAGE_DIR / "rhp_low.png")
+RHP_MID = Image.open(IMAGE_DIR / "rhp_mid.png")
+RHP_HIGH = Image.open(IMAGE_DIR / "rhp_high.png")
 
-LHP_LOW = Image.open("Images/lhp_low.png")
-LHP_MID = Image.open("Images/lhp_mid.png")
-LHP_HIGH = Image.open("Images/lhp_high.png")
+LHP_LOW = Image.open(IMAGE_DIR / "lhp_low.png")
+LHP_MID = Image.open(IMAGE_DIR / "lhp_mid.png")
+LHP_HIGH = Image.open(IMAGE_DIR / "lhp_high.png")
 
 #----------------------------------------------------------
 # Dictionary for proper RHP/LHP arm plot placement on pngs
