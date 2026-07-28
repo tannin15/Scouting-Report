@@ -1,7 +1,7 @@
 Public accessible link can be found at:
 
-pitcher-scouting-report.streamlit.app
-
+**pitcher-scouting-report.streamlit.app
+**
 
 Enter a pitchers name to pull up their report. This report follows the typical layout and statistics shown by 
 most organizations in their daily advance hitters meetings each game as close as possible.
