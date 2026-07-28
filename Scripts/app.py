@@ -605,7 +605,7 @@ def show_report_page(shared: dict, page: dict) -> None:
 
 st.markdown('<div class="app-title">Advance Scouting Report</div>', unsafe_allow_html=True)
 st.markdown(
-    '<div class="app-subtitle">Enter a full pitcher name to generate the scouting dashboard.</div>',
+    '<div class="app-subtitle">Enter a pithcers name (first and last) to generate the scouting dashboard.</div>',
     unsafe_allow_html=True,
 )
 
