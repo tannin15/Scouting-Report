@@ -1,5 +1,9 @@
 import matplotlib.pyplot as plt
 from PIL import Image
+from pathlib import Path
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+IMAGE_DIR = SCRIPT_DIR / "Images"
 
 
 # Calibration constants
@@ -40,18 +44,19 @@ def plot_release_point(pitch_data):
 
     pitcher_hand = str(pitch_data["p_throws"].iloc[0]).strip().upper()
 
-    # Calculate the pitcher's average release point.
+    # Calculate the pitcher's average release point. 
+    
     avg_extension = pitch_data["release_extension"].mean()
     avg_height = pitch_data["release_pos_z"].mean()
 
     if pitcher_hand == "L":
 
-        pitcher_img = Image.open("Images/rhp_extension.png")
+        pitcher_img = Image.open(IMAGE_DIR / "rhp_extension.png")
 
         league_extension = LHP_AVG_EXTENSION
         league_height = LHP_AVG_HEIGHT
 
-        # Mirror the silhouette across the graphic.
+        # Mirror the silhouette across the graphic. Image path is the same because image is simply mirrored, not a new image.
         image_extent = [
             mirror_x(IMAGE_LEFT),
             mirror_x(IMAGE_RIGHT),
@@ -65,7 +70,7 @@ def plot_release_point(pitch_data):
 
     else:
 
-        pitcher_img = Image.open("Images/rhp_extension.png")
+        pitcher_img = Image.open(IMAGE_DIR / "rhp_extension.png")
 
         league_extension = RHP_AVG_EXTENSION
         league_height = RHP_AVG_HEIGHT
