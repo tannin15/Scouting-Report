@@ -19,6 +19,8 @@ Each report is broken down into 3 different tabs
 In the extension plot/graphic:
   - red dot symbolizes the pitchers average Extension and Release Point
   - grey dot symbolizes the league average Extension and Release Point
+    - 6.45ft Ext, 5.72ft RelHgt average for RHPs
+    - 6.38ft Ext, 5.75ft RelHgt average for LHPs
 
 In the pitch movement plot:
   - dashed circle in the middle of the scatter plots signifies the average movement characteristics of each pitch type
