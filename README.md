@@ -7,7 +7,9 @@ Enter a pitchers name to pull up their report. This report follows the typical l
 most organizations in their daily advance hitters meetings each game as close as possible.
 
 Statistical and plotting search is only for the 2026 MLB season currently, MiLB stats are not included.
-If a Pitcher has big league time in 2026 season but is not currently on a big league roster, the report will still be generated but will only display MLB stats
+If a Pitcher has big league time in 2026 season but is not currently on a big league roster, the report will still be generated but will only display MLB stats.
+
+All data and plotting metrics are pulled directly from MLB API.
 
 Each report is broken down into 3 different tabs
   - overall statistics and plots over the entire season
