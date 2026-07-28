@@ -139,44 +139,6 @@ st.markdown(
             text-align: center;
         }
 
-        .count-table-wrap {
-            width: 100%;
-        }
-
-        .count-table {
-            border-collapse: collapse;
-            table-layout: fixed;
-            width: 100%;
-            font-size: clamp(0.72rem, 0.82vw, 0.92rem);
-            line-height: 1.28;
-        }
-
-        .count-table th,
-        .count-table td {
-            border: 1px solid #d1d5db;
-            padding: 0.42rem 0.18rem;
-            text-align: center;
-            vertical-align: middle;
-        }
-
-        .count-table th {
-            background: #f3f4f6;
-            font-weight: 800;
-            white-space: normal;
-        }
-
-        .count-table td {
-            white-space: nowrap;
-        }
-
-        .count-table th:first-child,
-        .count-table td:first-child {
-            width: 9%;
-            text-align: left;
-            font-weight: 700;
-            padding-left: 0.35rem;
-        }
-
         @media (max-width: 900px) {
             .block-container {
                 padding-left: 0.6rem;
@@ -464,7 +426,7 @@ def dynamic_table_height(table: pd.DataFrame) -> int:
     return min(44 + rows * 35, 520)
 
 
-def show_dataframe(table: pd.DataFrame) -> None:
+def show_table_one(table: pd.DataFrame) -> None:
     st.dataframe(
         table,
         width='stretch',
@@ -475,25 +437,28 @@ def show_dataframe(table: pd.DataFrame) -> None:
 
 
 def show_count_table(table: pd.DataFrame) -> None:
-    """Render the wide count-usage table at full width without horizontal scrolling."""
+    """
+    Render the Pitch Results and Count Usage table responsively.
+
+    On desktop:
+        The table stretches across the report width.
+
+    On smaller screens:
+        Columns remain readable and can be scrolled horizontally.
+    """
     if table is None or table.empty:
-        st.info("No pitch results or count usage data available for this split.")
+        st.info(
+            "No pitch results or count usage data available for this split."
+        )
         return
 
-    # A static HTML table lets all columns share the full report width.
-    table_html = table.to_html(
-        index=False,
-        border=0,
-        classes="count-table",
-        justify="center",
-        escape=True,
+    st.dataframe(
+        table,
+        width="stretch",
+        hide_index=True,
+        height=dynamic_table_height(table),
+        row_height=38,
     )
-
-    st.markdown(
-        f'<div class="count-table-wrap">{table_html}</div>',
-        unsafe_allow_html=True,
-    )
-
 
 def heatmap_columns(count: int) -> int:
     if count <= 1:
@@ -627,7 +592,7 @@ def show_report_page(shared: dict, page: dict) -> None:
     # Pitch arsenal now spans the full report width directly beneath the graphics.
     with st.container(border=True):
         st.markdown('<div class="section-label">Pitch Characteristics</div>', unsafe_allow_html=True)
-        show_dataframe(prepare_table_one(page["display_table_one"]))
+        show_table_one(prepare_table_one(page["display_table_one"]))
 
     st.write("")
     show_heatmaps(page.get("heatmaps") or {})
