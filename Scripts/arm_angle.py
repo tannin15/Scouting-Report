@@ -4,6 +4,8 @@ from matplotlib.patches import Polygon
 from PIL import Image
 from pathlib import Path
 
+SCRIPT_DIR = Path(__file__).resolve().parent
+IMAGE_DIR = SCRIPT_DIR / "Images"
 
 RHP_LOW = Image.open(IMAGE_DIR / "rhp_low.png")
 RHP_MID = Image.open(IMAGE_DIR / "rhp_mid.png")
