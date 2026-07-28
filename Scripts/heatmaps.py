@@ -6,12 +6,15 @@ from matplotlib.patches import Rectangle, Polygon
 from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.colors import PowerNorm
 from PIL import Image
+from pathlib import Path
 from pitch_dictionary import PITCH_INFO
 
 
+SCRIPT_DIR = Path(__file__).resolve().parent
+IMAGE_DIR = SCRIPT_DIR / "Images"
 
-lhb_img = Image.open("Images/lefty_batter.png")
-rhb_img = Image.open("Images/righty_batter.png")
+lhb_img = Image.open(IMAGE_DIR / "lefty_batter.png")
+rhb_img = Image.open(IMAGE_DIR / "righty_batter.png")
 
 # Create specific color mapping 
 # Red = Highest Density; Blue = Lowest Density; White = background
