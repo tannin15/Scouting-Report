@@ -6,12 +6,18 @@ from matplotlib.patches import Rectangle, Polygon
 from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.colors import PowerNorm
 from PIL import Image
+from pathlib import Path
 from pitch_dictionary import PITCH_INFO
 
 
 
-lhb_img = Image.open("Images/lefty_batter.png")
-rhb_img = Image.open("Images/righty_batter.png")
+# Find the folder where heatmaps.py is located
+BASE_DIR = Path(__file__).resolve().parent
+
+# Build image paths relative to heatmaps.py
+lhb_img = Image.open(BASE_DIR / "Images" / "lefty_batter.png")
+rhb_img = Image.open(BASE_DIR / "Images" / "righty_batter.png")
+
 
 # Create specific color mapping 
 # Red = Highest Density; Blue = Lowest Density; White = background
