@@ -6,6 +6,8 @@ import pandas as pd
 import streamlit as st
 
 from streamlit_main import generate_pitcher_report
+from player_lookup import get_pitcher_data
+from data_filters import add_game_context, pitching_teams, opposing_teams
 from milb_directory import MILB_AFFILIATE_ORG
 
 SCRIPT_DIR = Path(__file__).resolve().parent
@@ -139,6 +141,7 @@ st.markdown(
             text-align: center;
         }
 
+        
         @media (max-width: 900px) {
             .block-container {
                 padding-left: 0.6rem;
@@ -460,6 +463,7 @@ def show_count_table(table: pd.DataFrame) -> None:
         row_height=38,
     )
 
+
 def heatmap_columns(count: int) -> int:
     if count <= 1:
         return 1
@@ -589,7 +593,7 @@ def show_report_page(shared: dict, page: dict) -> None:
 
     st.write("")
 
-    # Pitch arsenal now spans the full report width directly beneath the graphics.
+    # Pitch arsenal now dynamic based on screen.
     with st.container(border=True):
         st.markdown('<div class="section-label">Pitch Characteristics</div>', unsafe_allow_html=True)
         show_table_one(prepare_table_one(page["display_table_one"]))
@@ -609,6 +613,8 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+# First retrieve the pitcher's season data so dropdown options reflect
+# the actual teams in that season, including teams before/after a trade.
 with st.form("pitcher_search", clear_on_submit=False):
     search_col, button_col = st.columns([5, 1], vertical_alignment="bottom")
     with search_col:
@@ -616,26 +622,76 @@ with st.form("pitcher_search", clear_on_submit=False):
             "Pitcher name", placeholder="Example: Sean Burke", label_visibility="collapsed"
         )
     with button_col:
-        submitted = st.form_submit_button("Generate Report", type="primary", width='stretch')
+        submitted = st.form_submit_button("Find Pitcher", type="primary", width="stretch")
 
 if submitted:
-    pitcher_name = pitcher_name.strip()
-    if not pitcher_name:
+    if not pitcher_name.strip():
         st.warning("Enter the pitcher's first and last name.")
         st.stop()
-
     try:
-        with st.spinner(f"Generating report for {pitcher_name}..."):
-            report = generate_pitcher_report(pitcher_name)
+        with st.spinner("Loading pitch data and available teams..."):
+            loaded = get_pitcher_data(pitcher_name.strip())
+            season_data = add_game_context(loaded[2])
+        st.session_state["scout_loaded"] = loaded
+        st.session_state["scout_name"] = pitcher_name.strip()
+        # Reset previous pitcher's report and selections.
+        st.session_state.pop("scout_report", None)
+        for key in ("scout_pitching_team", "scout_opponent", "scout_location"):
+            st.session_state.pop(key, None)
+    except Exception as error:
+        st.error(f"Unable to load pitcher: {error}")
+        st.stop()
 
-        st.success(f'Report generated for {report["shared"]["official_name"]}.')
+if "scout_loaded" in st.session_state:
+    loaded = st.session_state["scout_loaded"]
+    season_data = add_game_context(loaded[2])
+    teams = pitching_teams(season_data)
+    opponents = opposing_teams(season_data)
+    st.write(f"**{loaded[1]}** — select report filters")
+
+    with st.form("scout_filters"):
+        if len(teams) > 1:
+            pitching_team = st.selectbox(
+                "Pitching team", ["ALL"] + teams,
+                format_func=lambda x: "All Pitching Teams" if x == "ALL" else x,
+                key="scout_pitching_team",
+            )
+        else:
+            pitching_team = "ALL"
+
+        opponent = st.selectbox(
+            "Opposing team", ["ALL"] + opponents,
+            format_func=lambda x: "All Opponents" if x == "ALL" else x,
+            key="scout_opponent",
+        )
+        location = st.selectbox(
+            "Game location", ["ALL", "Home", "Road"],
+            format_func=lambda x: "All Games" if x == "ALL" else x,
+            key="scout_location",
+        )
+        generate = st.form_submit_button("Generate Report", type="primary")
+
+    if generate:
+        try:
+            with st.spinner(f"Generating report for {loaded[1]}..."):
+                report = generate_pitcher_report(
+                    st.session_state["scout_name"],
+                    pitching_team=pitching_team,
+                    opponent=opponent,
+                    location=location,
+                    loaded_data=loaded,
+                )
+            st.session_state["scout_report"] = report
+        except Exception as error:
+            st.session_state.pop("scout_report", None)
+            st.error(f"Unable to generate report: {error}")
+            with st.expander("Technical details"):
+                st.exception(error)
+
+    if "scout_report" in st.session_state:
+        report = st.session_state["scout_report"]
         split_names = ["Overall", "vs RHH", "vs LHH"]
         tabs = st.tabs(split_names)
         for tab, split_name in zip(tabs, split_names):
             with tab:
                 show_report_page(report["shared"], report["pages"][split_name])
-
-    except Exception as error:
-        st.error(f"Unable to generate report: {error}")
-        with st.expander("Technical details"):
-            st.exception(error)
