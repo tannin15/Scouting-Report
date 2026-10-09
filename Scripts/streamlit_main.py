@@ -3,6 +3,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 
 from player_lookup import get_pitcher_data
+from data_filters import add_game_context, filter_pitch_data
 from player_info import get_player_info
 from header_stats import get_header_stats
 from headshots import download_headshot
@@ -25,7 +26,7 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 # GENERATE REPORT DATA
 # --------------------------------
 
-def generate_pitcher_report(search_name):
+def generate_pitcher_report(search_name, pitching_team="ALL", opponent="ALL", location="ALL", loaded_data=None):
     """
     Generate all tables, graphics, player information, and split-specific
     content needed by the Streamlit app.
@@ -45,7 +46,11 @@ def generate_pitcher_report(search_name):
     # PLAYER LOOKUP
     # --------------------------------
 
-    pitcher_id, official_name, pitch_data, recent_data = get_pitcher_data(search_name)
+    if loaded_data is None:
+        pitcher_id, official_name, pitch_data, recent_data = get_pitcher_data(search_name)
+    else:
+        pitcher_id, official_name, pitch_data, recent_data = loaded_data
+
 
     if pitch_data is None or pitch_data.empty:
         raise ValueError(
@@ -78,6 +83,29 @@ def generate_pitcher_report(search_name):
             # The report should still load if the headshot fails.
             print(f"Unable to download headshot: {error}")
             headshot_file = None
+
+    # --------------------------------
+    # FILTER GAME DATA BEFORE HANDEDNESS SPLITS
+    # --------------------------------
+
+    pitch_data = filter_pitch_data(
+        add_game_context(pitch_data), pitching_team, opponent, location
+    )
+    if pitch_data.empty:
+        raise ValueError("No pitches match these filters. Try All Teams or All Games.")
+
+    if recent_data is not None and not recent_data.empty:
+        recent_data = filter_pitch_data(
+            add_game_context(recent_data), pitching_team, opponent, location
+        )
+
+    min_heatmap_pitches = 15
+
+    if opponent != "ALL" and location != "ALL":
+        min_heatmap_pitches = 1
+
+    elif opponent != "ALL" or location != "ALL":
+        min_heatmap_pitches = 1
 
     # --------------------------------
     # SPLIT FULL-SEASON DATA
@@ -144,11 +172,11 @@ def generate_pitcher_report(search_name):
     # HEATMAPS
     # --------------------------------
 
-    overall_heatmaps = pitch_heatmaps(overall_data, batter_side="ALL")
+    overall_heatmaps = pitch_heatmaps(overall_data, batter_side="ALL", min_pitches=min_heatmap_pitches)
 
-    rhh_heatmaps = pitch_heatmaps(rhh_data, batter_side="R")
+    rhh_heatmaps = pitch_heatmaps(rhh_data, batter_side="R", min_pitches=min_heatmap_pitches)
 
-    lhh_heatmaps = pitch_heatmaps(lhh_data, batter_side="L")
+    lhh_heatmaps = pitch_heatmaps(lhh_data, batter_side="L", min_pitches=min_heatmap_pitches)
 
     # --------------------------------
     # MOVEMENT PLOTS
