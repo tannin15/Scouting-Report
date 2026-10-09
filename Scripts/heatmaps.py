@@ -6,15 +6,12 @@ from matplotlib.patches import Rectangle, Polygon
 from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.colors import PowerNorm
 from PIL import Image
-from pathlib import Path
 from pitch_dictionary import PITCH_INFO
 
 
-SCRIPT_DIR = Path(__file__).resolve().parent
-IMAGE_DIR = SCRIPT_DIR / "Images"
 
-lhb_img = Image.open(IMAGE_DIR / "lefty_batter.png")
-rhb_img = Image.open(IMAGE_DIR / "righty_batter.png")
+lhb_img = Image.open("Images/lefty_batter.png")
+rhb_img = Image.open("Images/righty_batter.png")
 
 # Create specific color mapping 
 # Red = Highest Density; Blue = Lowest Density; White = background
@@ -176,7 +173,7 @@ def draw_batter(ax,batter_side):
 # DRAW ONE HEATMAP PER PITCH TYPE
 # ---------------------------------------
 
-def create_heatmap(pitch_subset, pitch_name, usage_pct, batter_side):
+def create_heatmap(pitch_subset, pitch_name, usage_pct, batter_side, min_pitches=15):
 
     fig, ax = plt.subplots(
         figsize=(3.4,4)
@@ -187,7 +184,7 @@ def create_heatmap(pitch_subset, pitch_name, usage_pct, batter_side):
     x = location_data["plate_x"]
     z = location_data["plate_z"]
 
-    if len(location_data) < 15:
+    if len(location_data) < min_pitches:
         plt.close(fig)
         return None
 
@@ -266,7 +263,7 @@ def create_heatmap(pitch_subset, pitch_name, usage_pct, batter_side):
 # PRODUCE HEATMAPS
 # ------------------------------
 
-def pitch_heatmaps(pitch_data, batter_side):
+def pitch_heatmaps(pitch_data, batter_side, min_pitches=15):
 
     heatmaps = {}
 
@@ -280,7 +277,7 @@ def pitch_heatmaps(pitch_data, batter_side):
 
         usage_pct = (len(pitch_subset)/len(pitch_data)*100)
 
-        fig = create_heatmap(pitch_subset, pitch_name, usage_pct, batter_side)
+        fig = create_heatmap(pitch_subset, pitch_name, usage_pct, batter_side, min_pitches=min_pitches)
 
         if fig is not None:
             heatmaps[pitch] = fig
